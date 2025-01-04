@@ -3,6 +3,7 @@ import numpy as np
 import pytesseract
 from utils import non_max_suppression, get_hsv_color_ranges
 import random
+import os
 
 lower_color = np.array([100, 150, 50], dtype=np.uint8)  
 upper_color = np.array([140, 255, 255], dtype=np.uint8)
@@ -10,7 +11,9 @@ upper_color = np.array([140, 255, 255], dtype=np.uint8)
 
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-
+def write_image(output_folder: str, img_name: str, img: np.array):
+    img_path = os.path.join(output_folder, img_name)
+    cv2.imwrite(img_path, img)
 
 def initialize_camera():
     '''
@@ -60,11 +63,15 @@ def preprocess_image(canvas, rect_start, rect_end):
     Preprocesamiento de la imagen 
     CAMBIAR PARA NUEVO MÉTODO?????
     '''
+    os.makedirs('output', exist_ok=True)
+    output_folder = "output"
+    write_image(output_folder, "img.png", canvas)
 
     gray = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite("gray.png", gray)
+    write_image(output_folder, "gray.png", gray)
+    
     _, binary = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV) 
-    cv2.imwrite("imagen_procesada.png", binary)
+    write_image(output_folder, "img_processed.png", binary)
     return binary
 
 
@@ -107,28 +114,6 @@ def generate_operation():
     if operator == '/':
         num1 = num1 * num2  # Asegurar divisiones exactas para facilidad de los cálculos
     return f"{num1} {operator} {num2}", eval(f"{num1}{operator}{num2}")
-
-
-def draw_menu(frame):
-    '''
-    Dibuja el menú principal con dos botones para elegir el modo del programa: "Juego" y "Calculadora"
-    Args:
-        - frame (ndarray): Fotograma donde dibujar el menú.
-    Return: 
-        - menu_frame (ndarray): Imagen con el menú dibujado.
-    '''
-
-    height, width, _ = frame.shape
-    menu_frame = frame.copy()
-
-    # Dibujar botones
-    cv2.rectangle(menu_frame, (width // 4 - 100, height // 2 - 50), (width // 4 + 100, height // 2 + 50), (255, 0, 0), -1)
-    cv2.putText(menu_frame, "Juego", (width // 4 - 60, height // 2 + 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-
-    cv2.rectangle(menu_frame, (3 * width // 4 - 100, height // 2 - 50), (3 * width // 4 + 100, height // 2 + 50), (0, 255, 0), -1)
-    cv2.putText(menu_frame, "Calculadora", (3 * width // 4 - 90, height // 2 + 15), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-
-    return menu_frame
 
 
 def main():
@@ -183,7 +168,6 @@ def main():
                 x, y = pen_tip
                 if width // 4 - 100 < x < width // 4 + 100 and height // 2 - 50 < y < height // 2 + 50:
                     mode = "game"
-                    print("mode=game")
                     resolved = True
                     drawing_canvas = np.zeros((height, width, 3), dtype=np.uint8)
                 elif 3 * width // 4 - 100 < x < 3 * width // 4 + 100 and height // 2 - 50 < y < height // 2 + 50:
@@ -212,7 +196,6 @@ def main():
                 target_expression, target_result = generate_operation()
                 resolved = False
     
-
             if pen_tip:
                 x, y = pen_tip
                 if width - 150 < x < width - 20 and 20 < y < 70:  # Recuadro Menú
@@ -226,8 +209,8 @@ def main():
 
             text = "Escriba su respuesta dentro del rectangulo"
             font = cv2.FONT_HERSHEY_COMPLEX
-            font_scale = 0.5  # Tamaño del texto
-            thickness = 1  # Grosor del texto
+            font_scale = 0.5  
+            thickness = 1  
 
             # Calcular el tamaño del texto para centrarlo
             (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
