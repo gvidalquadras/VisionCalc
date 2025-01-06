@@ -108,8 +108,8 @@ def generate_operation():
     Return: (string) Expresión generada.
     '''
     operators = ['+', '-', '*', '/']
-    num1 = random.randint(1, 20)
-    num2 = random.randint(1, 20)
+    num1 = random.randint(1, 10)
+    num2 = random.randint(1, 10)
     operator = random.choice(operators)
     if operator == '/':
         num1 = num1 * num2  # Asegurar divisiones exactas para facilidad de los cálculos
@@ -255,6 +255,7 @@ def main():
 
                 if result == target_result:
                     resolved = True
+                    print("Correcto! ")
                     drawing_canvas = np.zeros((height, width, 3), dtype=np.uint8)
 
                     

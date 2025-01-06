@@ -106,7 +106,7 @@ def main():
     height, width, _ = frame.shape
     drawing_canvas = np.zeros((height, width, 3), dtype=np.uint8)
     drawing = False
-    sequence = ["circle", "square", "triangle", "circle"]
+    sequence = ["circle"]
     user_sequence = []
     count = 0
 
@@ -158,12 +158,15 @@ def main():
             else:
                 print("Repite")
 
-        elif key("r"):
+        elif key == ord("r"):
+            print(user_sequence)
             if user_sequence == sequence:
                 print("Desbloqueado")
+                return True  
             else:
                 print("Inténtalo de nuevo")
                 user_sequence = []
+                return False 
 
         elif key == 27:  # Salir
             break

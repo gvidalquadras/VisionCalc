@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 
 # Definir los límites del color del bolígrafo en HSV
-# Cambia estos valores según el color de tu bolígrafo
 lower_color = np.array([156, 106, 103], dtype=np.uint8)  
 upper_color = np.array([200, 200, 200], dtype=np.uint8)  
 
